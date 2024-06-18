@@ -64,3 +64,7 @@ function generateVerificatorDigit(accessKey: string) {
   result === 11 ? (result = 0) : (result = result);
   return result;
 }
+
+export function print(message: string, data: any) {
+  console.log(message, JSON.stringify(data, null, 2));
+}

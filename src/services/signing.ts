@@ -1,6 +1,6 @@
-import * as forge from "node-forge";
 import { readFileSync } from "fs";
 import fetch from "node-fetch";
+import * as forge from "node-forge";
 
 export function getP12FromLocalFile(path: string) {
   const file = readFileSync(path);
@@ -60,7 +60,7 @@ function getRandomNumber(min = 990, max = 9999) {
 }
 
 export async function signXml(
-  p12Data: ArrayBuffer,
+  p12Data: ArrayBuffer | SharedArrayBuffer,
   p12Password: string,
   xmlData: string
 ) {

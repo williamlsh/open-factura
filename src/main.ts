@@ -1,11 +1,11 @@
+import { documentAuthorization } from "./services/authorization";
 import {
-  documentAuthorization,
-  documentReception,
   generateInvoice,
   generateInvoiceXml,
-  getP12FromUrl,
-  signXml,
-} from "open-factura";
+} from "./services/generateInvoice";
+import { documentReception } from "./services/reception";
+import { getP12FromLocalFile, signXml } from "./services/signing";
+import { print } from "./utils/utils";
 
 const { invoice, accessKey } = generateInvoice({
   infoTributaria: {
@@ -13,7 +13,7 @@ const { invoice, accessKey } = generateInvoice({
     tipoEmision: "1",
     razonSocial: "razonSocial0",
     nombreComercial: "nombreComercial0",
-    ruc: "0000000000001",
+    ruc: process.env.RUC!,
     codDoc: "01",
     estab: "000",
     ptoEmi: "000",
@@ -317,10 +317,13 @@ const { invoice, accessKey } = generateInvoice({
 
 const invoiceXml = generateInvoiceXml(invoice);
 
-const signature: ArrayBuffer = await getP12FromUrl("yoururl");
-const password = "yourpassword";
+const signature = getP12FromLocalFile(process.env.P12_FILE_PATH!);
 
-const signedInvoice = await signXml(signature, password, invoiceXml);
+const signedInvoice = await signXml(
+  signature,
+  process.env.PASSWORD!,
+  invoiceXml
+);
 
 const receptionResult = await documentReception(
   signedInvoice,
@@ -332,8 +335,8 @@ const authorizationResult = await documentAuthorization(
   process.env.SRI_AUTHORIZATION_URL!
 );
 
-console.log(invoice);
-console.log(invoiceXml);
-console.log(signedInvoice);
-console.log(receptionResult);
-console.log(authorizationResult);
+print("invoice", invoice);
+print("\ninvoice xml", invoiceXml);
+print("\nsigned invoice", signedInvoice);
+print("\nreception result", receptionResult);
+print("\nauthorization result", authorizationResult);
